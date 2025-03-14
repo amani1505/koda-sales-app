@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 const loginStyles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 20,
   },
   scrollContainer: {
     flexGrow: 1,

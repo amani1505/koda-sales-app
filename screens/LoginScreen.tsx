@@ -1,72 +1,90 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
+  StyleSheet,
   View,
+  Text,
   TextInput,
   TouchableOpacity,
+  Animated,
+  Easing,
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
-  Text,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/hooks/useAuth";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import loginStyles from "./login.style";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemedText } from "@/components/ThemedText";
-import loginStyles from "./login.style";
 
-const LoginScreen = () => {
-  const { login, isLoading } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+const { width } = Dimensions.get("window");
+
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
+  const { theme } = useTheme();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [isFormValid, setIsFormValid] = useState(false);
 
-  const formOpacity = useSharedValue(0);
-  const formTranslateY = useSharedValue(50);
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const buttonScaleAnim = useRef(new Animated.Value(1)).current;
+  const logoRotateAnim = useRef(new Animated.Value(0)).current;
 
+  // Run animations on component mount
   useEffect(() => {
-    formOpacity.value = withTiming(1, { duration: 1000 });
-    formTranslateY.value = withTiming(0, {
-      duration: 800,
-      easing: Easing.out(Easing.cubic),
-    });
+    Animated.stagger(150, [
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 800,
+          easing: Easing.out(Easing.exp),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.out(Easing.back(1.5)),
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(logoRotateAnim, {
+        toValue: 1,
+        duration: 600,
+        easing: Easing.out(Easing.back(1.5)),
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
-  const formAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: formOpacity.value,
-    transform: [{ translateY: formTranslateY.value }],
-  }));
-
-  useEffect(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isEmailValid = emailRegex.test(email);
-    const isPasswordValid = password.length >= 6;
-
-    setEmailError(isEmailValid ? "" : "Invalid email format");
-    setPasswordError(
-      isPasswordValid ? "" : "Password must be at least 6 characters"
-    );
-
-    setIsFormValid(isEmailValid && isPasswordValid);
-  }, [email, password]);
-
-  const handleLogin = async () => {
-    if (!isFormValid) {
-      alert("Please fill in all fields correctly");
-      return;
-    }
-    await login(email, password);
+  // Button press animation
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonScaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
+
+  // Logo rotation interpolation
+  const spin = logoRotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
     <SafeAreaView
@@ -75,138 +93,235 @@ const LoginScreen = () => {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      {/* Dynamic status bar that adapts to theme */}
+      <StatusBar style={theme.dark ? "light" : "dark"} />
+      
+      {/* Using KeyboardAvoidingView instead of KeyboardAwareScrollView */}
+      <KeyboardAvoidingView 
         style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
-        <ScrollView
-          contentContainerStyle={loginStyles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TouchableOpacity
-            style={loginStyles.themeToggle}
-            onPress={toggleTheme}
+        <View style={loginStyles.scrollContainer}>
+          <Animated.View
+            style={[
+              styles.logoContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+              },
+            ]}
           >
-            <Ionicons
-              name={theme.dark ? "sunny-outline" : "moon-outline"}
-              size={24}
-              color={theme.colors.foreground}
-            />
-          </TouchableOpacity>
-
-          <View style={loginStyles.logoContainer}>
-            <ThemedText
-              type="title"
-              style={{ color: theme.colors.primary.DEFAULT }}
+            <Animated.View
+              style={[
+                styles.logoCircle, 
+                { transform: [{ rotate: spin }] },
+                { backgroundColor: theme.colors.primary.DEFAULT }
+              ]}
             >
-              Koda Freight Management
-            </ThemedText>
-            <ThemedText
-              type="subtitle"
-              style={{ color: theme.colors.foreground }}
-            >
-              Sales Department
-            </ThemedText>
-          </View>
+              <Text style={styles.logoText}>K</Text>
+            </Animated.View>
+            <ThemedText style={styles.welcomeText}>Welcome back</ThemedText>
+            <Text style={[
+              styles.subtitleText,
+              { color: theme.dark ? "#6B6B6B" : "#8A8A8A" }
+            ]}>
+              Login to access your Koda Lead Haven dashboard
+            </Text>
+          </Animated.View>
 
           <Animated.View
-            style={[loginStyles.formContainer, formAnimatedStyle]}
-            className="my-2"
+            style={[
+              styles.formContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+              },
+            ]}
           >
-            <ThemedText
-              type="title"
-              style={{ color: theme.colors.foreground, textAlign: "center" }}
+            <ThemedText style={styles.inputLabel}>Email</ThemedText>
+            <Animated.View
+              style={[
+                styles.inputContainer,
+                {
+                  transform: [{ translateX: slideAnim }],
+                  opacity: fadeAnim,
+                  borderColor: theme.dark ? "#333" : "#DDD",
+                },
+              ]}
             >
-              Login
-            </ThemedText>
-
-            <View style={loginStyles.inputContainer}>
               <Ionicons
                 name="mail-outline"
-                size={20}
-                color={theme.colors.foreground}
-                style={loginStyles.inputIcon}
+                size={22}
+                color={theme.dark ? "#6B6B6B" : "#8A8A8A"}
+                style={styles.inputIcon}
               />
               <TextInput
                 style={[
-                  loginStyles.input,
-                  {
-                    backgroundColor: theme.colors.card.DEFAULT,
-                    color: theme.colors.foreground,
-                  },
+                  styles.input,
+                  { color: theme.colors.foreground }
                 ]}
-                placeholder="Email"
-                placeholderTextColor={theme.colors.muted.foreground}
+                placeholder="your.email@example.com"
+                placeholderTextColor={theme.dark ? "#6B6B6B" : "#8A8A8A"}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
-            </View>
-            {emailError ? (
-              <ThemedText style={loginStyles.errorText}>
-                {String(emailError)}
-              </ThemedText>
-            ) : null}
-            <View style={loginStyles.inputContainer}>
+            </Animated.View>
+
+            <ThemedText style={styles.inputLabel}>Password</ThemedText>
+            <Animated.View
+              style={[
+                styles.inputContainer,
+                {
+                  transform: [{ translateX: slideAnim }],
+                  opacity: fadeAnim,
+                  borderColor: theme.dark ? "#333" : "#DDD",
+                },
+              ]}
+            >
               <Ionicons
                 name="lock-closed-outline"
-                size={20}
-                color={theme.colors.foreground}
-                style={loginStyles.inputIcon}
+                size={22}
+                color={theme.dark ? "#6B6B6B" : "#8A8A8A"}
+                style={styles.inputIcon}
               />
               <TextInput
                 style={[
-                  loginStyles.input,
-                  {
-                    backgroundColor: theme.colors.card.DEFAULT,
-                    color: theme.colors.foreground,
-                  },
+                  styles.input,
+                  { color: theme.colors.foreground }
                 ]}
-                placeholder="Password"
-                placeholderTextColor={theme.colors.muted.foreground}
+                placeholder="••••••••"
+                placeholderTextColor={theme.dark ? "#6B6B6B" : "#8A8A8A"}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
-                style={loginStyles.eyeIcon}
                 onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
               >
                 <Ionicons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={20}
-                  color={theme.colors.foreground}
+                  name={showPassword ? "eye-outline" : "eye-off-outline"}
+                  size={22}
+                  color={theme.dark ? "#6B6B6B" : "#8A8A8A"}
                 />
               </TouchableOpacity>
-            </View>
-            {passwordError ? (
-              <ThemedText style={loginStyles.errorText}>
-                {String(passwordError)}
-              </ThemedText>
-            ) : null}
+            </Animated.View>
 
-            <TouchableOpacity
+            <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
+              <TouchableOpacity
+                style={[
+                  styles.signInButton,
+                  { backgroundColor: theme.colors.primary.DEFAULT }
+                ]}
+                onPress={animateButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.signInText}>Sign In</Text>
+                <Ionicons name="arrow-forward" size={20} color="#FFF" />
+              </TouchableOpacity>
+            </Animated.View>
+
+            <Animated.Text 
               style={[
-                loginStyles.loginButton,
-                {
-                  backgroundColor: isFormValid
-                    ? theme.colors.primary.DEFAULT
-                    : theme.colors.muted.DEFAULT,
-                },
+                styles.demoText, 
+                { 
+                  opacity: fadeAnim,
+                  color: theme.dark ? "#6B6B6B" : "#8A8A8A"
+                }
               ]}
-              onPress={handleLogin}
-              disabled={!isFormValid || isLoading}
             >
-              <ThemedText style={loginStyles.loginButtonText}>
-                <Text>{isLoading ? "Loading..." : "Login"}</Text>
-              </ThemedText>
-            </TouchableOpacity>
+              Demo credentials: demo@kodahaven.com / password
+            </Animated.Text>
           </Animated.View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
+}
 
-export default LoginScreen;
+const styles = StyleSheet.create({
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  logoCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#5D00FF",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+    shadowColor: "#5D00FF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  logoText: {
+    color: "#FFF",
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  welcomeText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  subtitleText: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+  formContainer: {
+    width: "100%",
+    maxWidth: 350,
+  },
+  inputLabel: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 6,
+    marginBottom: 20,
+    height: 50,
+  },
+  inputIcon: {
+    marginHorizontal: 10,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  signInButton: {
+    borderRadius: 6,
+    paddingVertical: 12,
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  signInText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 8,
+  },
+  demoText: {
+    fontSize: 12,
+    textAlign: "center",
+    marginTop: 20,
+  },
+});

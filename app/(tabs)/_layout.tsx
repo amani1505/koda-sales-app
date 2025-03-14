@@ -11,22 +11,6 @@ import Login from "..";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
-  const isAuthenticated = false; // Replace with your authentication logic
-
-  // Use useEffect to handle navigation after the component mounts
-  useEffect(() => {
-    if (!isAuthenticated) {
-      <Login />;
-    }
-  }, [isAuthenticated]); // Run only when isAuthenticated changes
-
-  // If not authenticated, return null or a loading indicator
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  // Render the tabs if authenticated
   return (
     <Tabs
       screenOptions={{

@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
+import React from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { MotiText, MotiView } from "moti";
@@ -11,12 +10,7 @@ interface SplashScreenProps {
 }
 
 function SplashScreen({ onFinish }: SplashScreenProps) {
-  const [isPressed, setIsPressed] = useState(false); // State to handle tap effect
   const { theme } = useTheme();
-
-  const handleStart = () => {
-    if (onFinish) onFinish(); // Call the onFinish callback
-  };
 
   return (
     <ThemedView style={styles.container}>
@@ -83,12 +77,9 @@ function SplashScreen({ onFinish }: SplashScreenProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1000 }}
       >
-    <ThemedText type="subtitle" style={{ color: theme.colors.foreground }}>
-        © {new Date().getFullYear()} Koda Freight Management{" "}
-            </ThemedText>
-
-
-        {/* Dynamic year */}
+        <ThemedText type="subtitle" style={{ color: theme.colors.foreground }}>
+          {`© ${new Date().getFullYear()} Koda Freight Management`}
+        </ThemedText>
       </MotiText>
     </ThemedView>
   );
