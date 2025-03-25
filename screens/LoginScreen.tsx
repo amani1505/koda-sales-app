@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Dimensions,
-  KeyboardAvoidingView,
+    KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -65,7 +64,7 @@ export default function LoginScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, );
 
   // Button press animation
   const animateButton = () => {

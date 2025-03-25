@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useState, ReactNode } from "react";
 import { Text, StyleSheet, Animated } from "react-native";
 
 type ToastType = "success" | "error" | "info";

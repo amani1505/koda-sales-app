@@ -29,7 +29,7 @@
     "expo-haptics": "~14.0.1",
     "expo-linking": "~7.0.5",
     "expo-navigation-bar": "~4.0.8",
-    "expo-router": "~4.0.18",
+    "expo-router": "~4.0.19",
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
@@ -63,7 +63,9 @@
     "jest-expo": "~52.0.6",
     "react-test-renderer": "18.3.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "~8.0.1"
   },
   "private": true,
   "packageManager": "yarn@4.5.3+sha512.3003a14012e2987072d244c720506549c1aab73ee728208f1b2580a9fd67b92d61ba6b08fe93f6dce68fd771e3af1e59a0afa28dd242dd0940d73b95fedd4e90"

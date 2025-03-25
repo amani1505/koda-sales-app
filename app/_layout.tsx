@@ -8,7 +8,6 @@ import SplashScreen from "@/screens/splash-screen/SplashScreen";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Header } from "@/components/Header";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppBarHeader from "@/components/ui/AppBarHeader";
 

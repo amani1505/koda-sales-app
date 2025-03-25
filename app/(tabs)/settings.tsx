@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import {  View } from 'react-native';
 
 const Settings = () => {
     return (
@@ -9,6 +9,6 @@ const Settings = () => {
     );
 }
 
-const styles = StyleSheet.create({})
+
 
 export default Settings;

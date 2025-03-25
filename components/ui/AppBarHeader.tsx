@@ -1,5 +1,4 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { Appbar } from "react-native-paper";
 import { ThemedView } from "../ThemedView";
 import { useTheme } from "@/hooks/useTheme";
@@ -15,9 +14,10 @@ const AppBarHeader = ({ title }: Props) => {
       <Appbar.Header
         style={{
           backgroundColor: theme.colors.background,
-          elevation: 9, // Disable elevation for this header
+          elevation: 0, // Disable elevation for this header
           paddingHorizontal: 16,
-          paddingVertical: 8,
+
+          borderBottomWidth: 1,
         }}
       >
         {/* <Appbar.BackAction onPress={() => {}} /> */}
@@ -33,6 +33,6 @@ const AppBarHeader = ({ title }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({});
+
 
 export default AppBarHeader;

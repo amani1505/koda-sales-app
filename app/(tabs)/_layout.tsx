@@ -2,13 +2,11 @@ import { Tabs } from "expo-router";
 import React from "react"; // Import useEffect
 import { Platform } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const { theme } = useTheme();
-  const colorScheme = useColorScheme();
   return (
     <Tabs
       screenOptions={{
