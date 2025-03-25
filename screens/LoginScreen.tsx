@@ -17,11 +17,14 @@ import { StatusBar } from "expo-status-bar";
 import loginStyles from "./login.style";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemedText } from "@/components/ThemedText";
+import { useAuth } from "@/hooks/useAuth";
+import { router } from "expo-router";
 
-const { width } = Dimensions.get("window");
+
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
+  const { login } = useAuth();
   const { theme } = useTheme();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -78,6 +81,8 @@ export default function LoginScreen() {
         useNativeDriver: true,
       }),
     ]).start();
+
+    handleSubmit();
   };
 
   // Logo rotation interpolation
@@ -85,6 +90,10 @@ export default function LoginScreen() {
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
   });
+  const handleSubmit = async () => {
+    await login(email, password);
+    router.push("/(tabs)");
+  };
 
   return (
     <SafeAreaView
@@ -95,9 +104,9 @@ export default function LoginScreen() {
     >
       {/* Dynamic status bar that adapts to theme */}
       <StatusBar style={theme.dark ? "light" : "dark"} />
-      
+
       {/* Using KeyboardAvoidingView instead of KeyboardAwareScrollView */}
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
@@ -114,18 +123,20 @@ export default function LoginScreen() {
           >
             <Animated.View
               style={[
-                styles.logoCircle, 
+                styles.logoCircle,
                 { transform: [{ rotate: spin }] },
-                { backgroundColor: theme.colors.primary.DEFAULT }
+                { backgroundColor: theme.colors.primary.DEFAULT },
               ]}
             >
               <Text style={styles.logoText}>K</Text>
             </Animated.View>
             <ThemedText style={styles.welcomeText}>Welcome back</ThemedText>
-            <Text style={[
-              styles.subtitleText,
-              { color: theme.dark ? "#6B6B6B" : "#8A8A8A" }
-            ]}>
+            <Text
+              style={[
+                styles.subtitleText,
+                { color: theme.dark ? "#6B6B6B" : "#8A8A8A" },
+              ]}
+            >
               Login to access your Koda Lead Haven dashboard
             </Text>
           </Animated.View>
@@ -157,10 +168,7 @@ export default function LoginScreen() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.foreground }
-                ]}
+                style={[styles.input, { color: theme.colors.foreground }]}
                 placeholder="your.email@example.com"
                 placeholderTextColor={theme.dark ? "#6B6B6B" : "#8A8A8A"}
                 value={email}
@@ -188,10 +196,7 @@ export default function LoginScreen() {
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.foreground }
-                ]}
+                style={[styles.input, { color: theme.colors.foreground }]}
                 placeholder="••••••••"
                 placeholderTextColor={theme.dark ? "#6B6B6B" : "#8A8A8A"}
                 value={password}
@@ -214,7 +219,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={[
                   styles.signInButton,
-                  { backgroundColor: theme.colors.primary.DEFAULT }
+                  { backgroundColor: theme.colors.primary.DEFAULT },
                 ]}
                 onPress={animateButton}
                 activeOpacity={0.8}
@@ -224,13 +229,13 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </Animated.View>
 
-            <Animated.Text 
+            <Animated.Text
               style={[
-                styles.demoText, 
-                { 
+                styles.demoText,
+                {
                   opacity: fadeAnim,
-                  color: theme.dark ? "#6B6B6B" : "#8A8A8A"
-                }
+                  color: theme.dark ? "#6B6B6B" : "#8A8A8A",
+                },
               ]}
             >
               Demo credentials: demo@kodahaven.com / password
